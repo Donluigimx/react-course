@@ -1,22 +1,22 @@
-let React = require('react');
-let PropTypes = require('prop-types');
-let api = require('../utils/api');
+import React from 'react';
+import PropTypes from 'prop-types';
+import { fetchPopularRepos } from '../utils/api';
+import Loading from './Loading';
 
 function SelectLanguage(props) {
     let languages = ['All', 'Javascript', 'Ruby', 'Java', 'CSS', 'Python'];
+    const { selectedLanguage, onSelect } = props;
 
     return (
         <ul className="languages">
-            {languages.map(function (lang) {
-                return (
-                    <li
-                        style={lang === props.selectedLanguage ? {color: '#d0021b'}: null}
-                        onClick={props.onSelect.bind(null, lang)}
-                        key={lang}>
-                        {lang}
-                    </li>
-                )
-            }, this)}
+            {languages.map((lang) => (
+                <li
+                    style={lang === selectedLanguage ? {color: '#d0021b'}: null}
+                    onClick={() => onSelect(lang)}
+                    key={lang}>
+                    {lang}
+                </li>
+            ))}
         </ul>
     )
 }
@@ -48,25 +48,20 @@ function RepoGrid(props) {
 
 RepoGrid.propTypes = {
     repos: PropTypes.array.isRequired,
-}
+};
 
 class Popular extends React.Component {
 
-    constructor (props) {
-        super(props);
-        this.state = {
-            selectedLanguage: 'All',
-            repos: null
-        };
+    state = {
+        selectedLanguage: 'All',
+        repos: null
+    };
 
-        this.updateLanguage = this.updateLanguage.bind(this);
-    }
-
-    componentDidMount() {
+    componentDidMount = () => {
         this.updateLanguage(this.state.selectedLanguage)
-    }
+    };
 
-    updateLanguage(lang) {
+    updateLanguage = async (lang) => {
         this.setState(function () {
             return {
                 selectedLanguage: lang,
@@ -74,15 +69,10 @@ class Popular extends React.Component {
             }
         });
 
-        api.fetchPopularRepos(lang)
-            .then((repos) => {
-                this.setState(function () {
-                    return {
-                        repos:repos,
-                    }
-                })
-            });
-    }
+        const repos = await fetchPopularRepos(lang);
+
+        this.setState(() => ({ repos }));
+    };
 
     render() {
 
@@ -93,10 +83,10 @@ class Popular extends React.Component {
                     onSelect={this.updateLanguage}
                 />
                 {!this.state.repos
-                ? <p>Loading</p>
+                ? <Loading/>
                 : <RepoGrid repos={this.state.repos}/>}
             </div>
-    )
+        )
     }
 }
 

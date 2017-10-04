@@ -1,8 +1,9 @@
-var path = require('path');
-var HtmlWebPackPlugin = require('html-webpack-plugin')
+const path = require('path');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
-module.exports = {
-    entry: './app/index.js',
+const config = {
+    entry: ['babel-polyfill', 'whatwg-fetch', './app/index.js'],
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: "index_bundle.js",
@@ -20,4 +21,17 @@ module.exports = {
     plugins: [new HtmlWebPackPlugin({
         template: 'app/index.html'
     })]
+};
+
+if (process.env.NODE_ENV === 'production') {
+    config.plugins.push(
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+            }
+        }),
+        new webpack.optimize.UglifyJsPlugin()
+    )
 }
+
+module.exports = config;

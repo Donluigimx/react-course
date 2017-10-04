@@ -1,9 +1,7 @@
-let React = require('react');
-let ReactDOM = require('react-dom');
-let PropTypes = require('prop-types');
-
-require('./index.css');
-var App = require('./components/App');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './components/App';
 
 
 
